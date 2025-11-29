@@ -9,7 +9,7 @@
 A walkthrough of why gradients vanish, how to spot them, and which well-established ideas help us keep training signals alive.
 
 - Prerequisites: Basic deep learning concepts (as I am not defining some of the concepts here)
-- Visualization web app: [Hugging Face Space](https://huggingface.co/spaces/hvinay/<>)
+- Visualization web app: [Hugging Face Space](https://huggingface.co/spaces/hvinay/<>)(Layers of the model can be viewed through Netron)
 - Medium article: [Vanishing Gradients on Medium](https://medium.com/<>)
 
 ## Table of Contents <!-- omit in toc -->
@@ -76,7 +76,7 @@ graph RL
 
 ### Mathematical View
 
-The formal view matches the intuition: multiplying many Jacobians whose singular values are below one shrinks the overall gradient. This subsection is <b>not essential</b> for using neural networks, but it helps build intuition for the vanishing gradients problem.
+This subsection is <b>not essential</b> for using/applying neural networks, but it helps build intuition for the vanishing gradients problem. The formal view matches the intuition: multiplying many Jacobians whose singular values are below one shrinks the overall gradient. 
 
 When each layer contributes a Jacobian with singular values < 1, their product collapses toward zero, freezing earlier layers. To see this, we write gradients with respect to parameters (using the chain-rule, see Eq. 6.46<sup>[3]</sup>)
 
@@ -96,7 +96,7 @@ $$
 \quad \text{and } \left[ \mathbf{J}_k \right]_{i,j} = \frac{\partial [\mathbf{a}_k]_i}{\partial [\mathbf{a}_{k-1}]_j}
 $$
 
-This means we multiply successive Jacobians as we backpropagate from output layer $L$ to layer $l$. Taking (spectral) norm gives:
+This means we multiply successive Jacobians as we backpropagate from output layer $L$ to layer $l$. Taking spectral norm<sup>[5][6]</sup> gives:
 
 $$
 \left\|\frac{\partial \mathcal{L}}{\partial \mathbf{W}_l}\right\|
@@ -112,6 +112,9 @@ $$
 $$
 
 If both $\lVert \frac{\partial \mathbf{a}_l}{\partial \mathbf{W}_l} \rVert$ and $\lVert\frac{\partial \mathcal{L}}{\partial \mathbf{a}_L}\rVert$ remain bounded, and every $\lVert\mathbf{J}_k\rVert < 1$, then the product of Jacobians contracts toward zero. As a result, gradients with respect to early activations $\mathbf{a}_l$ or parameters $\mathbf{W}_l$ also approach zero ("vanish").
+
+<details id="feedforward-network">
+<summary><b>Feedforward Dense Network(Collapsed for simplicity)</b></summary>
 
 For a feedforward network (ignoring the bias term) with activation $h(\cdot)$ <sup>[4]</sup>,
 
@@ -144,7 +147,9 @@ $$
 = \prod_{k=l+1}^{L} \sigma_{k}^{W} \cdot \sigma_{k}^{h'}
 $$
 
-With singular values $\sigma_k^W < 1$, gradients quickly shrink toward zero. This connects the math directly to the earlier intuition: multiply enough sub-unit singular values and the product collapses.
+Last equality uses known result<sup>[6]</sup>. With singular values $\sigma_k^W < 1$, gradients quickly shrink toward zero.
+
+</details>
 
 ## Why it exists
 
@@ -181,7 +186,7 @@ Vanishing gradients show up in familiar architectures when those causes pile up.
 
 - **Sequence Models**: Vanilla RNNs lose dependencies beyond a few steps without gating because the same Jacobian is multiplied many times.
 - **Very deep CNNs**: Early VGG-style stacks (>16 conv blocks) saturate without careful initialization.
-- **Generative Diffusion**: Score networks with long U-Net backbones suffer when skip connections are absent or poorly normalized.
+<!-- - **Generative Diffusion**: Score networks with long U-Net backbones suffer when skip connections are absent or poorly normalized. -->
 
 Spotting these patterns in familiar architectures helps you predict when gradients might fade before you even plot anything, which sets up the monitoring steps below.
 
@@ -225,7 +230,7 @@ Spotting these patterns in familiar architectures helps you predict when gradien
   </div>
 </div>
 
-- **Layer-wise gradient norms**: plotting the average gradient norm (e.g., $\lVert\frac{\partial \mathcal{L}}{\partial \mathbf{W}_l}\rVert$ or its log) for each layer versus depth is a standard way to check for vanishing gradients. A sharp downward trend as you move to earlier layers (see Figure 5) strongly indicates vanishing gradients, so this should be one of the first diagnostics you run.
+- **Layer-wise gradient norms**: plotting the average gradient norm (or its log) for each layer versus depth is a standard way to check for vanishing gradients. A sharp downward trend as you move to earlier layers (see Figure 5) strongly indicates vanishing gradients, so this should be one of the first diagnostics you run.
 - **Gradient norm histograms**: Log per-layer $\frac{\partial \mathcal{L}}{\partial \mathbf{W}_l}$. Vanishing gradients show up as a central spike at zero (for layer 0) with rapidly decreasing probability for larger values (see Figure 7). Comparing early and late layers side by side makes the contrast obvious.
 - **Loss plateauing**: Monitor the training and validation loss curves for early and sustained plateaus; a flat loss curve (see Figure 6) while training indicates that gradients may not be propagating effectively, often due to vanishing gradients. However, note that plateauing loss can also occur for reasons other than vanishing gradients, such as learning rate issues or poor data/model fit. 
 - **Activation watchpoints**: Track the percentage of neurons in saturation (sigmoid > 0.99 or < 0.01).
@@ -251,3 +256,5 @@ If several of these indicators line up, it is a strong signal that gradients are
 2. He, K., Zhang, X., Ren, S., & Sun, J. (2015). *Delving Deep into Rectifiers: Surpassing Human-Level Performance on ImageNet Classification*. Proceedings of the IEEE International Conference on Computer Vision (ICCV), 1026–1034.
 3. Goodfellow, I., Bengio, Y., & Courville, A. (2016). *Deep Learning*. MIT Press. (See especially Section 6.5 on backpropagation.)
 4. UVADLC, "Part 2: Vanishing and Exploding Gradients," Lecture 5. [Online]. Available: https://uvadlc.github.io/lectures-nov2020.html
+5. Spectral norm. (2024, March 12). *Wikipedia*. https://en.wikipedia.org/wiki/Spectral_norm
+6. Horn, R. A., & Johnson, C. R. (2012). *Matrix Analysis* (2nd ed.). Cambridge University Press. (See Example 5.6.6 on matrix norms and singular values.)
