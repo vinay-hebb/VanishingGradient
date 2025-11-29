@@ -49,9 +49,9 @@ graph LR
 
 Before diving into equations, it helps to visualize what happens if every layer scales the incoming gradient by some constant smaller than one. Imagine each layer receives a gradient as input (the "backpropagated" gradient from the layer above - See Figure 2), and simply multiplies it by a scalar $c$ with $|c| < 1$. After passing through $n$ layers:
 
-```math
+$$
 \text{Gradient at layer 0} = (\text{Gradient at output}) \times c^n
-```
+$$
 
 For example, if $c = 0.5$ and $n = 10$, then $c^n = 0.5^{10} \approx 0.001$ — a thousand-fold reduction! This is why, with even modestly deep networks, gradients can shrink exponentially fast. With that picture in mind, the chain-rule derivation in the next subsection should feel less abstract.
 
@@ -80,24 +80,24 @@ The formal view matches the intuition: multiplying many Jacobians whose singular
 
 When each layer contributes a Jacobian with singular values < 1, their product collapses toward zero, freezing earlier layers. To see this, we write gradients with respect to parameters (using the chain-rule, see Eq. 6.46<sup>[3]</sup>)
 
-```math
+$$
 \frac{\partial \mathcal{L}}{\partial \mathbf{W}_l} =
  \left(\frac{\partial \mathbf{a}_l}{\partial \mathbf{W}_l}\right)^\top
 \frac{\partial \mathcal{L}}{\partial \mathbf{a}_l}
-```
+$$
 
 Gradients $\frac{\partial \mathbf{a}_l}{\partial \mathbf{W}_l}$ and $\frac{\partial \mathcal{L}}{\partial \mathbf{a}_l}$ are column vectors. The gradient with respect to hidden activations at layer $l$ is: (by applying the chain rule)
 
-```math
+$$
 \frac{\partial \mathcal{L}}{\partial \mathbf{a}_l} =
 \left( \prod_{k=l+1}^{L} \mathbf{J}_k^\top \right)
 \frac{\partial \mathcal{L}}{\partial \mathbf{a}_L},
 \quad \text{where }\mathbf{J}_k = \frac{\partial \mathbf{a}_k}{\partial \mathbf{a}_{k-1}}
-```
+$$
 
 Here, Jacobian $\mathbf{J}_k = \frac{\partial \mathbf{a}_k}{\partial \mathbf{a}_{k-1}}$ is a matrix with entry $(i,j)$ representing $\frac{\partial a_{k,i}}{\partial a_{k-1,j}}$. This means we multiply successive Jacobians as we backpropagate from output layer $L$ to layer $l$. Taking (spectral) norm gives:
 
-```math
+$$
 \left\|\frac{\partial \mathcal{L}}{\partial \mathbf{W}_l}\right\|
 = \left\|
  \left(\frac{\partial \mathbf{a}_l}{\partial \mathbf{W}_l}\right)^\top
@@ -108,7 +108,7 @@ Here, Jacobian $\mathbf{J}_k = \frac{\partial \mathbf{a}_k}{\partial \mathbf{a}_
 \left\| \frac{\partial \mathbf{a}_l}{\partial \mathbf{W}_l} \right\|
 \left\| \prod_{k=l+1}^{L} \mathbf{J}_k^\top \right\|
 \left\|\frac{\partial \mathcal{L}}{\partial \mathbf{a}_L}\right\|
-```
+$$
 
 If both $\left\| \frac{\partial \mathbf{a}_l}{\partial \mathbf{W}_l} \right\|$ and $\left\|\frac{\partial \mathcal{L}}{\partial \mathbf{a}_L}\right\|$ remain bounded, and every $\|\mathbf{J}_k\| < 1$, then the product of Jacobians contracts toward zero. As a result, gradients with respect to early activations $\mathbf{a}_l$ or parameters $\mathbf{W}_l$ also approach zero ("vanish").
 
@@ -119,16 +119,16 @@ $$\mathbf{a}_l = h(\mathbf{z}_l) = h(\mathbf{W}_l \mathbf{a}_{l-1})$$
 
 $\operatorname{diag}\left(h'(\mathbf{z}_l)\right) \cdot \mathbf{W}_l \sim m \times n$ -->
 
-```math
+$$
 \frac{\partial \mathbf{a}_l}{\partial \mathbf{a}_{l-1}} = 
 \frac{\partial h(\mathbf{W}_l \mathbf{a}_{l-1})}{\partial \mathbf{a}_{l-1}}
 = \operatorname{diag}\left(h'(\mathbf{z}_l)\right) \cdot \mathbf{W}_l
-```
+$$
 $h'(\mathbf{z}_l)$ is a vector of derivatives applied elementwise. So the spectral norm
 
-```math
+$$
 \left\| \frac{\partial \mathbf{a}_l}{\partial \mathbf{a}_{l-1}} \right\| \leq \|\mathbf{W}_l\| \cdot \|\operatorname{diag}(h'(\mathbf{z}_l))\|
-```
+$$
 where $\|\mathbf{W}_l\|$ is its largest singular value and $\|\operatorname{diag}(h'(\mathbf{z}_l))\|$ is the maximum of $|h'(z_{l,i})|$ over activations.
 
 $$
