@@ -93,9 +93,10 @@ $$
 \left( \prod_{k=l+1}^{L} \mathbf{J}_k^\top \right)
 \frac{\partial \mathcal{L}}{\partial \mathbf{a}_L},
 \quad \text{where }\mathbf{J}_k = \frac{\partial \mathbf{a}_k}{\partial \mathbf{a}_{k-1}}
+\quad \text{and } \left[ \mathbf{J}_k \right]_{i,j} = \frac{\partial [\mathbf{a}_k]_i}{\partial [\mathbf{a}_{k-1}]_j}
 $$
 
-Here, Jacobian $\mathbf{J}_k = \frac{\partial \mathbf{a}_k}{\partial \mathbf{a}_{k-1}}$ is a matrix with entry $(i,j)$ representing $\frac{\partial a_{k,i}}{\partial a_{k-1,j}}$. This means we multiply successive Jacobians as we backpropagate from output layer $L$ to layer $l$. Taking (spectral) norm gives:
+This means we multiply successive Jacobians as we backpropagate from output layer $L$ to layer $l$. Taking (spectral) norm gives:
 
 $$
 \left\|\frac{\partial \mathcal{L}}{\partial \mathbf{W}_l}\right\|
@@ -110,7 +111,7 @@ $$
 \left\|\frac{\partial \mathcal{L}}{\partial \mathbf{a}_L}\right\|
 $$
 
-If both $\left\| \frac{\partial \mathbf{a}_l}{\partial \mathbf{W}_l} \right\|$ and $\left\|\frac{\partial \mathcal{L}}{\partial \mathbf{a}_L}\right\|$ remain bounded, and every $\|\mathbf{J}_k\| < 1$, then the product of Jacobians contracts toward zero. As a result, gradients with respect to early activations $\mathbf{a}_l$ or parameters $\mathbf{W}_l$ also approach zero ("vanish").
+If both $\lVert \frac{\partial \mathbf{a}_l}{\partial \mathbf{W}_l} \rVert$ and $\lVert\frac{\partial \mathcal{L}}{\partial \mathbf{a}_L}\rVert$ remain bounded, and every $\lVert\mathbf{J}_k\rVert < 1$, then the product of Jacobians contracts toward zero. As a result, gradients with respect to early activations $\mathbf{a}_l$ or parameters $\mathbf{W}_l$ also approach zero ("vanish").
 
 For a feedforward network (ignoring the bias term) with activation $h(\cdot)$ <sup>[4]</sup>,
 
@@ -132,7 +133,7 @@ $$
 \left\| \frac{\partial \mathbf{a}_l}{\partial \mathbf{a}_{l-1}} \right\| \leq \|\mathbf{W}_l\| \cdot \|\operatorname{diag}(h'(\mathbf{z}_l))\|
 $$
 
-where $\|\mathbf{W}_l\|$ is its largest singular value and $\|\operatorname{diag}(h'(\mathbf{z}_l))\|$ is the maximum of $\|h'(z_l)\|$ over activations.
+where $\lVert\mathbf{W}_l\rVert$ is its largest singular value and $\lVert\operatorname{diag}(h'(\mathbf{z}_l))\rVert$ is the maximum of $\lVert h'(z_l)\rVert$ over activations.
 <!-- where $\|\mathbf{W}_l\|$ is its largest singular value and $\|\operatorname{diag}(h'(\mathbf{z}_l))\|$ is the maximum of $\|h'(z_{l,i})\|$ over activations. -->
 
 $$
@@ -152,7 +153,7 @@ Now that we have both the picture and the math, the root causes line up cleanly.
 <div align="center">
   <img src="./assets/activation_functions.png" alt="tanh/sigmoid activation derivatives" title="" style="max-width: 600px; width: 100%;"/>
   <div style="margin-top:6px; font-size: 1em;">
-    Figure 3: tanh/sigmoid and its gradients have near-zero derivatives when |x| &gt;&gt; 0.
+    Figure 3: tanh/sigmoid and its gradients have near-zero derivatives when $\lvert x \rvert \gg 0$.
   </div>
 </div>
 
@@ -224,7 +225,7 @@ Spotting these patterns in familiar architectures helps you predict when gradien
   </div>
 </div>
 
-- **Layer-wise gradient norms**: plotting the average gradient norm (e.g., $\|\frac{\partial \mathcal{L}}{\partial \mathbf{W}_l}\|$ or its log) for each layer versus depth is a standard way to check for vanishing gradients. A sharp downward trend as you move to earlier layers (see Figure 5) strongly indicates vanishing gradients, so this should be one of the first diagnostics you run.
+- **Layer-wise gradient norms**: plotting the average gradient norm (e.g., $\lVert\frac{\partial \mathcal{L}}{\partial \mathbf{W}_l}\rVert$ or its log) for each layer versus depth is a standard way to check for vanishing gradients. A sharp downward trend as you move to earlier layers (see Figure 5) strongly indicates vanishing gradients, so this should be one of the first diagnostics you run.
 - **Gradient norm histograms**: Log per-layer $\frac{\partial \mathcal{L}}{\partial \mathbf{W}_l}$. Vanishing gradients show up as a central spike at zero (for layer 0) with rapidly decreasing probability for larger values (see Figure 7). Comparing early and late layers side by side makes the contrast obvious.
 - **Loss plateauing**: Monitor the training and validation loss curves for early and sustained plateaus; a flat loss curve (see Figure 6) while training indicates that gradients may not be propagating effectively, often due to vanishing gradients. However, note that plateauing loss can also occur for reasons other than vanishing gradients, such as learning rate issues or poor data/model fit. 
 - **Activation watchpoints**: Track the percentage of neurons in saturation (sigmoid > 0.99 or < 0.01).
