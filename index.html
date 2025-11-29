@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artifact Gradient Explorer</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <script src="https://cdn.jsdelivr.net/npm/netron@7.9.9"></script>
+    <style>
+        :root {
+            --bg: #f5f6f7;
+            --panel: #ffffff;
+            --stroke: #dcdfe3;
+            --text: #1f2933;
+            --muted: #6b7280;
+            --primary: #0f766e;
+            --accent: #f0fdfc;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 24px;
+        }
+        .shell {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .hero {
+            background: var(--panel);
+            border: 1px solid var(--stroke);
+            border-radius: 10px;
+            padding: 16px 18px;
+        }
+        .hero h1 {
+            margin: 0 0 6px;
+            font-size: 1.4rem;
+        }
+        .hero p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: minmax(220px, 1fr) auto;
+            align-items: center;
+            gap: 12px;
+            background: var(--panel);
+            border: 1px solid var(--stroke);
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .control label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--stroke);
+            border-radius: 6px;
+            background: #fff;
+            font-size: 0.95rem;
+        }
+        .btn {
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: 1px solid var(--stroke);
+            background: var(--panel);
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn.primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-flex;
+        }
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 8px);
+            transform: translateX(-50%);
+            background: #111827;
+            color: #f9fafb;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+        .tooltip::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 100%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #111827;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+            z-index: 11;
+        }
+        .tooltip:hover::after,
+        .tooltip:hover::before {
+            opacity: 1;
+        }
+        .btn.primary:disabled {
+            background: #e5e7eb;
+            border-color: #d1d5db;
+            color: var(--muted);
+        }
+        .artifact-meta {
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+        .status {
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+        .status[data-tone="success"] { color: #0f766e; }
+        .status[data-tone="warning"] { color: #b45309; }
+        .status[data-tone="error"] { color: #b91c1c; }
+        .loading {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            color: var(--muted);
+        }
+        .loading.active { display: flex; }
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 3px solid var(--stroke);
+            border-top-color: var(--primary);
+            animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--stroke);
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .panel h2 {
+            margin: 0 0 10px;
+            font-size: 1.1rem;
+        }
+        .stack { display: flex; flex-direction: column; gap: 14px; }
+        .chart-area { position: relative; min-height: 320px; }
+        .netron-frame {
+            width: 100%;
+            height: 420px;
+            border: 1px solid var(--stroke);
+            border-radius: 8px;
+        }
+        .model-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .model-tab {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--stroke);
+            background: #fff;
+            cursor: pointer;
+        }
+        .model-tab.active {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--accent);
+        }
+        .info-box {
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--accent);
+            border: 1px dashed var(--stroke);
+            border-radius: 6px;
+            display: none;
+        }
+        .info-box.active { display: block; }
+        .wandb {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .wandb .btn { align-self: flex-start; }
+        .heatmap-wrap { overflow-x: auto; }
+        .animation-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--panel);
+            border: 1px solid var(--stroke);
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        .progress {
+            flex: 1;
+            height: 10px;
+            background: var(--stroke);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), #14b8a6);
+            transition: width 0.2s ease;
+        }
+        .muted { color: var(--muted); }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <header class="hero">
+            <h1>Vanishing Gradient Visualizations</h1>
+            <p>Select an artifact set for gradient visualizations of pre-trained models.</p>
+        </header>
+
+        <section class="controls">
+            <div class="control">
+                <label for="artifact-set">Artifact set</label>
+                <select id="artifact-set" aria-label="Artifact set"></select>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span class="tooltip" data-tooltip="Not implemented yet">
+                    <button class="btn primary" id="animate-btn" disabled aria-disabled="true">Animate</button>
+                </span>
+            </div>
+            <div class="artifact-meta" id="artifact-meta"></div>
+            <div class="status" id="artifact-status"></div>
+        </section>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+
+        <section class="animation-bar">
+            <div class="progress">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <span id="epoch-display" class="muted">0 / 0</span>
+        </section>
+
+        <section id="results" class="stack" style="display: none;">
+            <article class="panel" id="gradients-plot">
+                <h2>Gradient Magnitudes</h2>
+                <div class="chart-area">
+                    <canvas id="gradients-chart"></canvas>
+                </div>
+            </article>
+
+            <article class="panel" id="heatmap-section">
+                <h2>Gradient Heatmap</h2>
+                <div class="model-tabs" id="heatmap-tabs"></div>
+                <div class="heatmap-wrap">
+                    <canvas id="heatmap-canvas"></canvas>
+                </div>
+                <div class="info-box" id="heatmap-layer-info"></div>
+            </article>
+
+            <article class="panel" id="loss-section">
+                <h2>Training Loss</h2>
+                <div class="chart-area">
+                    <canvas id="loss-chart"></canvas>
+                </div>
+                <div class="info-box" id="loss-info"></div>
+            </article>
+
+            <article class="panel" id="wandb-section">
+                <h2>Weights & Biases</h2>
+                <p class="muted">Links appear when runs were logged for this artifact set.</p>
+                <div class="wandb">
+                    <div class="model-tabs" id="wandb-buttons"></div>
+                    <div class="status" id="wandb-empty"></div>
+                </div>
+            </article>
+
+            <article class="panel" id="model-architecture">
+                <h2>Model Architecture</h2>
+                <div class="model-tabs" id="model-tabs"></div>
+                <div class="netron-container">
+                    <div class="netron-frame" id="netron-view"></div>
+                </div>
+                <div class="info-box" id="layer-info"></div>
+            </article>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
