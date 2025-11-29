@@ -146,7 +146,7 @@ With singular values $\sigma_k^W < 1$, gradients quickly shrink toward zero. Thi
 Now that we have both the picture and the math, the root causes line up cleanly.
 
 <div align="center">
-  <img src="./assets/activation_functions.png" alt="tanh/sigmoid activation derivatives" title="" style="max-width: 420px; width: 100%;"/>
+  <img src="./assets/activation_functions.png" alt="tanh/sigmoid activation derivatives" title="" style="max-width: 600px; width: 100%;"/>
   <div style="margin-top:6px; font-size: 1em;">
     Figure 3: tanh/sigmoid and its gradients have near-zero derivatives when |x| &gt;&gt; 0.
   </div>
@@ -167,9 +167,9 @@ Vanishing gradients show up in familiar architectures when those causes pile up.
     src="./assets/gradient-heatmap.png" 
     alt="Layer-wise gradient heatmap" 
     title="Layer-wise gradient heatmap"
-    style="max-width: 440px; width: 100%; display: block; margin: 0 auto;"
+    style="max-width: 600px; width: 100%; display: block; margin: 0 auto;"
   />
-  <div style="margin-top: 8px; font-size: 1em; max-width: 430px;">
+  <div style="margin-top: 8px; font-size: 1em;">
     Figure 4: Layer-wise gradient heatmap - Gradients are not propagated (marked blue) to earlier layers (layers 0, 1, ...) compared to layer 9 (marked non-blue)
   </div>
 </div>
@@ -189,7 +189,7 @@ Spotting these patterns in familiar architectures helps you predict when gradien
     src="./assets/gradient-magnitude-over-layers.png" 
     alt="" 
     title="" 
-    style="max-width: 420px; width: 100%; display: block; margin: 0 auto;"
+    style="max-width: 600px; width: 100%; display: block; margin: 0 auto;"
   />
   <div style="margin-top: 6px; font-size: 1em;">
     Figure 5: Layer-wise gradient magnitude - For tanh/sigmoid, Earlier layers have small gradient magnitudes in comparison to later layers
@@ -201,7 +201,7 @@ Spotting these patterns in familiar architectures helps you predict when gradien
     src="./assets/Loss-plateauing.png" 
     alt="" 
     title="" 
-    style="max-width: 420px; width: 100%; display: block; margin: 0 auto;"
+    style="max-width: 600px; width: 100%; display: block; margin: 0 auto;"
   />
   <div style="margin-top: 6px; font-size: 1em;">
     Figure 6: Loss for networks with sigmoid/tanh plateaus quickly
@@ -213,9 +213,9 @@ Spotting these patterns in familiar architectures helps you predict when gradien
     src="./assets/gradient-histograms.png" 
     alt="" 
     title="" 
-    style="max-width: 420px; width: 100%; display: block; margin: 0 auto;"
+    style="max-width: 600px; width: 100%; display: block; margin: 0 auto;"
   />
-  <div style="margin-top: 6px; font-size: 1em; max-width: 420px;">
+  <div style="margin-top: 6px; font-size: 1em;">
     Figure 7: Gradient Norm Histogram: Gradients are clustered around 0 for layer 0 in comparison to layer 9
   </div>
 </div>
