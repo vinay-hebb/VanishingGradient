@@ -47,7 +47,7 @@ graph LR
 
 ### Intuitive Understanding
 
-Before diving into equations, it helps to visualize what happens if every layer scales the incoming gradient by some constant smaller than one. Imagine each layer receives a gradient as input (the "backpropagated" gradient from the layer above - See Figure 2), and simply multiplies it by a scalar $c$ with $|c| < 1$. After passing through $n$ layers:
+Before diving into equations, it helps to visualize what happens if every layer scales the incoming gradient by some constant smaller than one. Imagine each layer receives a gradient as input (the "backpropagated" gradient from the layer above - See Figure 2), and simply multiplies it by a scalar $c$ with $\lvert c \rvert < 1$. After passing through $n$ layers:
 
 $$
 \text{Gradient at layer 0} = (\text{Gradient at output}) \times c^n
@@ -115,6 +115,7 @@ If both $\left\| \frac{\partial \mathbf{a}_l}{\partial \mathbf{W}_l} \right\|$ a
 For a feedforward network (ignoring the bias term) with activation $h(\cdot)$ <sup>[4]</sup>,
 
 $$\mathbf{a}_l = h(\mathbf{z}_l) = h(\mathbf{W}_l \mathbf{a}_{l-1})$$
+
 <!-- $W_l \sim m \times n; a_{l-1} \sim n \times 1 \implies z_l \sim m \times 1 \implies a_{l}=h(z_l) \sim m \times 1 \implies \text{diag}(h(z_l)) \sim m \times m$
 
 $\operatorname{diag}\left(h'(\mathbf{z}_l)\right) \cdot \mathbf{W}_l \sim m \times n$ -->
@@ -124,12 +125,15 @@ $$
 \frac{\partial h(\mathbf{W}_l \mathbf{a}_{l-1})}{\partial \mathbf{a}_{l-1}}
 = \operatorname{diag}\left(h'(\mathbf{z}_l)\right) \cdot \mathbf{W}_l
 $$
+
 $h'(\mathbf{z}_l)$ is a vector of derivatives applied elementwise. So the spectral norm
 
 $$
 \left\| \frac{\partial \mathbf{a}_l}{\partial \mathbf{a}_{l-1}} \right\| \leq \|\mathbf{W}_l\| \cdot \|\operatorname{diag}(h'(\mathbf{z}_l))\|
 $$
-where $\|\mathbf{W}_l\|$ is its largest singular value and $\|\operatorname{diag}(h'(\mathbf{z}_l))\|$ is the maximum of $|h'(z_{l,i})|$ over activations.
+
+where $\|\mathbf{W}_l\|$ is its largest singular value and $\|\operatorname{diag}(h'(\mathbf{z}_l))\|$ is the maximum of $\|h'(z_l)\|$ over activations.
+<!-- where $\|\mathbf{W}_l\|$ is its largest singular value and $\|\operatorname{diag}(h'(\mathbf{z}_l))\|$ is the maximum of $\|h'(z_{l,i})\|$ over activations. -->
 
 $$
 \left\| \frac{\partial \mathcal{L}}{\partial \mathbf{W}_l} \right\| \propto 
@@ -154,7 +158,7 @@ Now that we have both the picture and the math, the root causes line up cleanly.
 
 <br>
 
-1. **Saturating non-linearities**: sigmoid/tanh squash inputs into flat regions with near-zero derivatives (as in the bottom subplot of Figure 3) when $|x| \gg 0$. If most activations live there, their Jacobians contribute tiny factors to the product.
+1. **Saturating non-linearities**: sigmoid/tanh squash inputs into flat regions with near-zero derivatives (as in the bottom subplot of Figure 3) when $\lvert x \rvert \gg 0$. If most activations live there, their Jacobians contribute tiny factors to the product.
 2. **Poor initialization**: Small random weights yield Jacobians with spectral norms below one. Xavier/Glorot initialization showed analytically (simple derivation) that choosing variance `2/(fan_in + fan_out)` balances forward/backward signal flow in tanh networks<sup>[1]</sup>.
 3. **Deep compositions**: Each extra layer multiplies the gradient by another contraction.
 

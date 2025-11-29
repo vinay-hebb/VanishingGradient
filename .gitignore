@@ -11,3 +11,7 @@ cache/wandb_runs
 MyNotes.md
 *Zone.Identifier
 blog/assets/Backup/
+vendor/
+_site/
+Gemfile*
+.bundle/

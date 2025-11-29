@@ -14,12 +14,39 @@
       padding: 32px 20px 48px;
     }
   </style>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 </head>
 <body>
   <main class="markdown-body">
     {{ content }}
   </main>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.mermaid) {
+        // Convert fenced ```mermaid blocks to <div class="mermaid"> for rendering.
+        document.querySelectorAll('pre code.language-mermaid').forEach(function (code) {
+          const pre = code.parentElement;
+          const container = document.createElement('div');
+          container.className = 'mermaid';
+          container.textContent = code.textContent;
+          pre.replaceWith(container);
+        });
+        mermaid.initialize({ startOnLoad: false });
+        mermaid.run({ querySelector: '.mermaid' });
+      }
+    });
+  </script>
 </body>
 </html>
-
