@@ -581,46 +581,25 @@ function renderWandbPanel() {
     if (!buttonsElement || !emptyStateElement) return;
 
     buttonsElement.innerHTML = '';
-    emptyStateElement.textContent = 'Load an artifact set to see W&B runs.';
+    emptyStateElement.textContent = 'Open the project to browse all experiment runs.';
     emptyStateElement.style.display = 'block';
 
     if (!wandbInfo || !wandbInfo.enabled) {
+        emptyStateElement.textContent = 'Weights & Biases disabled for this session.';
         return;
     }
 
-    const runEntries = Object.entries(wandbInfo.runs || {});
-    if (!runEntries.length) {
-        emptyStateElement.textContent = 'Weights & Biases links will appear after logging.';
-        return;
-    }
-
-    let hasNavigableLink = false;
-    runEntries.forEach(([modelKey, info]) => {
-        const label = modelNames[modelKey] || modelKey;
-        const runButton = document.createElement('button');
-        runButton.type = 'button';
-        runButton.className = 'btn';
-        runButton.textContent = label;
-
-        const runUrl = info?.url;
-        if (runUrl) {
-            hasNavigableLink = true;
-            runButton.addEventListener('click', () => {
-                window.open(runUrl, '_blank', 'noopener');
-            });
-        } else {
-            runButton.disabled = true;
-            runButton.title = 'Run URL not available yet.';
-        }
-
-        buttonsElement.appendChild(runButton);
+    const projectUrl = 'https://wandb.ai/vinayh/VanishingGradient';
+    const projectButton = document.createElement('button');
+    projectButton.type = 'button';
+    projectButton.className = 'btn';
+    projectButton.textContent = 'Open W&B project';
+    projectButton.addEventListener('click', () => {
+        window.open(projectUrl, '_blank', 'noopener');
     });
 
-    if (!hasNavigableLink) {
-        emptyStateElement.textContent = 'Links will appear once wandb provides run URLs.';
-    } else {
-        emptyStateElement.style.display = 'none';
-    }
+    buttonsElement.appendChild(projectButton);
+    emptyStateElement.style.display = 'none';
 }
 
 function highlightLayer(layerIndex) {

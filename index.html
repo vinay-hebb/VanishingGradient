@@ -270,6 +270,15 @@
         </section>
 
         <section id="results" class="stack" style="display: none;">
+            <article class="panel" id="model-architecture">
+                <h2>Model Architecture — Click model name to view</h2>
+                <div class="model-tabs" id="model-tabs"></div>
+                <div class="netron-container">
+                    <div class="netron-frame" id="netron-view"></div>
+                </div>
+                <div class="info-box" id="layer-info"></div>
+            </article>
+
             <article class="panel" id="gradients-plot">
                 <h2>Gradient Magnitudes</h2>
                 <div class="chart-area">
@@ -296,20 +305,11 @@
 
             <article class="panel" id="wandb-section">
                 <h2>Weights & Biases</h2>
-                <p class="muted">Links appear when runs were logged for this artifact set.</p>
+                <p class="muted">Open the project to view runs across all experiments.</p>
                 <div class="wandb">
                     <div class="model-tabs" id="wandb-buttons"></div>
                     <div class="status" id="wandb-empty"></div>
                 </div>
-            </article>
-
-            <article class="panel" id="model-architecture">
-                <h2>Model Architecture</h2>
-                <div class="model-tabs" id="model-tabs"></div>
-                <div class="netron-container">
-                    <div class="netron-frame" id="netron-view"></div>
-                </div>
-                <div class="info-box" id="layer-info"></div>
             </article>
         </section>
     </div>
