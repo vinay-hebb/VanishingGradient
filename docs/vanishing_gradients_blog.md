@@ -6,11 +6,11 @@
 </style> -->
 # Vanishing Gradients: Four Ws and One H <!-- omit in toc -->
 
+[🔍 Visualization](https://huggingface.co/spaces/hvinay/VanishingGradient) | [💻 GitHub repo](https://github.com/vinay-hebb/VanishingGradient)
+
 A walkthrough of why gradients vanish, how to spot them, and which well-established ideas help us keep training signals alive.
 
 - Prerequisites: Basic deep learning concepts (as I am not defining some of the concepts here)
-- Visualization web app: [Hugging Face Space](https://huggingface.co/spaces/hvinay/<>)(Layers of the model can be viewed through Netron)
-- Medium article: [Vanishing Gradients on Medium](https://medium.com/<>)
 
 ## Table of Contents <!-- omit in toc -->
 - [What it is](#what-it-is)
