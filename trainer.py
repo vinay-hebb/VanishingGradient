@@ -227,7 +227,7 @@ def _init_wandb_run(run_dir: str | None, run_name: str, config: dict):
 
         def start(mode: str):
             return wandb.init(
-                project='Gradient',
+                project='VanishingGradient',
                 mode=mode,
                 name=run_name,
                 dir=run_dir,

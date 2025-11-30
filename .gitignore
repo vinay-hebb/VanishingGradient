@@ -5,7 +5,6 @@ __pycache__/
 .config/
 .local/
 cache/wandb_runs
-*.onnx
 *.onnx.data
 *.pyc
 MyNotes.md
