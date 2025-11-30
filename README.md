@@ -1,11 +1,11 @@
 ---
-title: Gradient
-emoji: 🐠
-colorFrom: pink
-colorTo: gray
+title: VanishingGradient
+emoji: 🐢
+colorFrom: indigo
+colorTo: red
 sdk: docker
 pinned: false
-license: mit
+short_description: Visualization for Vanishing gradients
 ---
 
 # Gradient
@@ -39,5 +39,3 @@ Deep-learning playground for exploring vanishing gradients. Ships a small Flask 
 ## Environment variables
 - `REMOTE_MODEL_BASE_URL`: (default github URL) Override the API base URL if you host the front-end separately from the Flask API. Leave unset on Hugging Face Spaces so the browser calls the same origin.
 - `ENABLE_NETRON_ON_LOCAL_SERVER`: (default off) Set to `1`/`true` locally to spin up a Netron server for model visualization. It is disabled by default when `SPACE_ID` is present (Hugging Face Spaces) because 127.0.0.1 ports are not exposed; the UI will fall back to the hosted `netron.app` embed there.
-
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
