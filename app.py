@@ -64,7 +64,7 @@ netron_servers = {}
 netron_lock = threading.Lock()
 REMOTE_MODEL_BASE_URL = os.environ.get(
     'REMOTE_MODEL_BASE_URL',
-    'https://github.com/vinay-hebb/VanishingGradient/tree/main/cache/').strip()
+    'https://github.com/vinay-hebb/VanishingGradient/blob/main/cache/').strip()
 # REMOTE_MODEL_BASE_URL = ''    # To render with on-disk models
 # print(REMOTE_MODEL_BASE_URL)
 
