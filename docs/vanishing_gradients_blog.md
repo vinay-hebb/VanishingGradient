@@ -114,7 +114,7 @@ $$
 If both $\lVert \frac{\partial \mathbf{a}_l}{\partial \mathbf{W}_l} \rVert$ and $\lVert\frac{\partial \mathcal{L}}{\partial \mathbf{a}_L}\rVert$ remain bounded, and every $\lVert\mathbf{J}_k\rVert < 1$, then the product of Jacobians contracts toward zero. As a result, gradients with respect to early activations $\mathbf{a}_l$ or parameters $\mathbf{W}_l$ also approach zero ("vanish").
 
 <details id="feedforward-network">
-<summary><b>Feedforward Dense Network(Collapsed for simplicity)</b></summary>
+<summary><b>Feedforward Dense Network Example(Interested can read)</b></summary>
 
 For a feedforward network (ignoring the bias term) with activation $h(\cdot)$ <sup>[4]</sup>,
 
